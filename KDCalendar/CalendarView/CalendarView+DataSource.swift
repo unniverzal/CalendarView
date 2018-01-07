@@ -27,7 +27,7 @@ import UIKit
 
 extension CalendarView: UICollectionViewDataSource {
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
         guard let dateSource = self.dataSource else { return 0 }
 
         self.startDateCache = dateSource.startDate()
@@ -69,7 +69,7 @@ extension CalendarView: UICollectionViewDataSource {
         return (firstDay: firstWeekdayOfMonthIndex, daysTotal: numberOfDaysInMonth)
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         var monthOffsetComponents = DateComponents()
         monthOffsetComponents.month = section;
@@ -84,7 +84,7 @@ extension CalendarView: UICollectionViewDataSource {
         
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let dayCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! CalendarDayCell
         

@@ -32,7 +32,7 @@ struct EventLocation {
     let longitude: Double
 }
 
-struct CalendarEvent {
+public struct CalendarEvent {
     let title: String
     let startDate: Date
     let endDate:Date
@@ -53,7 +53,7 @@ extension CalendarViewDataSource {
     }
 }
 
-protocol CalendarViewDelegate {
+public protocol CalendarViewDelegate {
     
     /* optional */ func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool
     func calendar(_ calendar : CalendarView, didScrollToMonth date : Date) -> Void
@@ -66,7 +66,7 @@ extension CalendarViewDelegate {
     func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void { return }
 }
 
-class CalendarView: UIView {
+public class CalendarView: UIView {
     
     struct Style {
 
@@ -151,11 +151,11 @@ class CalendarView: UIView {
         self.setup()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    override func awakeFromNib() {
+    override public func awakeFromNib() {
         super.awakeFromNib()
         self.setup()
     }
@@ -196,7 +196,7 @@ class CalendarView: UIView {
         return self.collectionView.collectionViewLayout as! CalendarFlowLayout
     }
     
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         
         self.headerView.frame = CGRect(
