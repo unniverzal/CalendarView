@@ -28,10 +28,11 @@ import UIKit
 class CalendarHeaderView: UIView {
     
     lazy var monthLabel : UILabel = {
+        
         let lbl = UILabel()
         lbl.textAlignment = NSTextAlignment.center
-        lbl.font = UIFont(name: CalendarView.Style.headerFontName, size: 20.0)
-        lbl.textColor = CalendarView.Style.headerTextColor
+        lbl.font = UIFont.systemFont(ofSize: 20)
+        lbl.textColor = CalendarView.Style.HeaderTextColor
         
         self.addSubview(lbl)
         
@@ -39,6 +40,7 @@ class CalendarHeaderView: UIView {
     }()
     
     lazy var dayLabelContainerView : UIView = {
+        
         let v = UIView()
         
         let formatter = DateFormatter()
@@ -47,10 +49,10 @@ class CalendarHeaderView: UIView {
             
             let weekdayLabel = UILabel()
             
-            weekdayLabel.font = UIFont(name: CalendarView.Style.headerFontName, size: 14.0)
+            weekdayLabel.font = UIFont.systemFont(ofSize: 14)
             
-            weekdayLabel.text = formatter.shortWeekdaySymbols[(index % 7)]
-            weekdayLabel.textColor = CalendarView.Style.headerTextColor
+            weekdayLabel.text = formatter.shortWeekdaySymbols[(index % 7)].uppercased()
+            weekdayLabel.textColor = CalendarView.Style.HeaderTextColor
             weekdayLabel.textAlignment = NSTextAlignment.center
             
             v.addSubview(weekdayLabel)
@@ -62,14 +64,27 @@ class CalendarHeaderView: UIView {
         
     }()
     
+    lazy var borderView : UIView = {
+        
+        let v = UIView()
+        
+        v.backgroundColor = UIColor.lightGray
+        
+        self.addSubview(v)
+        
+        return v
+        
+    }()
+    
     override func layoutSubviews() {
+        
         super.layoutSubviews()
         
         var frm = self.bounds
         frm.origin.y += 5.0
         frm.size.height = 40.0
         
-        self.monthLabel.frame = frm
+        self.monthLabel.frame = CGRect.zero
         
         var labelFrame = CGRect(
             x: 0.0,
@@ -83,5 +98,10 @@ class CalendarHeaderView: UIView {
             lbl.frame = labelFrame
             labelFrame.origin.x += labelFrame.size.width
         }
+        
+        borderView.frame = CGRect.init(x: 0, y: self.bounds.maxY + 4, width: self.bounds.size.width, height: 1)
+        self.addSubview(borderView)
     }
+    
 }
+

@@ -28,8 +28,9 @@ import UIKit
 extension CalendarView: UICollectionViewDataSource {
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        
         guard let dateSource = self.dataSource else { return 0 }
-
+        
         self.startDateCache = dateSource.startDate()
         self.endDateCache   = dateSource.endDate()
         
@@ -49,14 +50,16 @@ extension CalendarView: UICollectionViewDataSource {
             let distanceFromTodayComponents = self.calendar.dateComponents([.month, .day], from: self.startOfMonthCache, to: today)
             
             self.todayIndexPath = IndexPath(item: distanceFromTodayComponents.day!, section: distanceFromTodayComponents.month!)
+            
         }
         
         // if we are for example on the same month and the difference is 0 we still need 1 to display it
         return self.calendar.dateComponents([.month], from: startDateCache, to: endDateCache).month! + 1
+        
     }
     
     internal func getMonthInfo(for date: Date) -> (firstDay: Int, daysTotal: Int)? {
-    
+        
         var firstWeekdayOfMonthIndex    = self.calendar.component(.weekday, from: date)
         firstWeekdayOfMonthIndex        = firstWeekdayOfMonthIndex - 1 // firstWeekdayOfMonthIndex should be 0-Indexed
         firstWeekdayOfMonthIndex        = (firstWeekdayOfMonthIndex + 6) % 7 // push it modularly to take it back one day where the first day is Monday instead of Sunday
@@ -83,7 +86,8 @@ extension CalendarView: UICollectionViewDataSource {
         return 42 // 7 x 6
         
     }
-
+    
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let dayCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! CalendarDayCell
@@ -111,9 +115,9 @@ extension CalendarView: UICollectionViewDataSource {
             self.scrollViewDidEndDecelerating(collectionView)
         }
         
-        if let idx = todayIndexPath {
-            dayCell.isToday = (idx.section == indexPath.section && idx.item + firstDayIndex == indexPath.item)
-        }
+        //        if let idx = todayIndexPath {
+        //            dayCell.isToday = (idx.section == indexPath.section && idx.item + firstDayIndex == indexPath.item)
+        //        }
         
         if let eventsForDay = self.eventsByIndexPath[indexPath] {
             dayCell.eventsCount = eventsForDay.count
@@ -123,4 +127,7 @@ extension CalendarView: UICollectionViewDataSource {
         
         return dayCell
     }
+    
 }
+
+

@@ -23,8 +23,12 @@
  *
  */
 
+
+
 import UIKit
 import EventKit
+
+let cellReuseIdentifier = "CalendarDayCell"
 
 struct EventLocation {
     let title: String
@@ -38,7 +42,9 @@ public struct CalendarEvent {
     let endDate:Date
 }
 
-protocol CalendarViewDataSource {
+
+
+public protocol CalendarViewDataSource {
     func startDate() -> Date
     func endDate() -> Date
 }
@@ -61,22 +67,23 @@ public protocol CalendarViewDelegate {
     /* optional */ func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void
 }
 
-extension CalendarViewDelegate {
+public extension CalendarViewDelegate {
     func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool { return true }
     func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void { return }
 }
 
+
 public class CalendarView: UIView {
     
-    struct Style {
-
-        enum CellShapeOptions {
-            case round
-            case square
-            case bevel(CGFloat)
+    public struct Style {
+        
+        public enum CellShapeOptions {
+            case Round
+            case Square
+            case Bevel(CGFloat)
             var isRound: Bool {
                 switch self {
-                case .round:
+                case .Round:
                     return true
                 default:
                     return false
@@ -84,42 +91,40 @@ public class CalendarView: UIView {
             }
         }
         
-        static var cellColorDefault         = UIColor(white: 0.0, alpha: 0.1)
-        static var cellTextColorDefault     = UIColor.gray
-        static var cellTextColorToday       = UIColor.gray
-        static var cellColorToday           = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.3)
-        static var cellBorderColor          = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.8)
-        static var cellBorderWidth: CGFloat = 2.0
-        static var cellShape                = CellShapeOptions.bevel(4.0)
+        public static var CellColorDefault         = UIColor(white: 0.0, alpha: 0.1)
+        public static var CellTextColorDefault     = UIColor.gray
+        public static var CellTextColorToday       = UIColor.gray
+        public static var CellColorToday           = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.3)
+        public static var CellBorderColor          = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.8)
+        public static var CellBorderWidth: CGFloat = 2.0
+        public static var CellShape                = CellShapeOptions.Bevel(4.0)
         
-        static var cellEventColor           = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.8)
+        public static var CellEventColor           = UIColor(red: 254.0/255.0, green: 73.0/255.0, blue: 64.0/255.0, alpha: 0.8)
         
-        static var headerFontName: String   = "Helvetica"
-        static var headerTextColor          = UIColor.gray
+        public static var HeaderFontName: String   = "Helvetica"
+        public static var HeaderTextColor          = UIColor.gray
         
-        static var headerHeight: CGFloat    = 80.0
+        public static var HeaderHeight: CGFloat    = 80.0
     }
-
-    let cellReuseIdentifier = "CalendarDayCell"
-
-    var dataSource  : CalendarViewDataSource?
-    var delegate    : CalendarViewDelegate?
     
-    lazy var calendar : Calendar = {
+    public var dataSource  : CalendarViewDataSource?
+    public var delegate    : CalendarViewDelegate?
+    
+    public lazy var calendar : Calendar = {
         var gregorian = Calendar(identifier: .gregorian)
         gregorian.timeZone = TimeZone(abbreviation: "UTC")!
         return gregorian
     }()
     
-    var direction : UICollectionViewScrollDirection = .horizontal {
+    public var direction : UICollectionViewScrollDirection = .horizontal {
         didSet {
             flowLayout.scrollDirection = direction
             self.collectionView.reloadData()
         }
     }
     
-    internal var startDateCache     = Date()
-    internal var endDateCache       = Date()
+    public var startDateCache     = Date()
+    public var endDateCache       = Date()
     internal var startOfMonthCache  = Date()
     
     internal var todayIndexPath: IndexPath?
@@ -127,25 +132,34 @@ public class CalendarView: UIView {
     
     internal(set) var selectedIndexPaths    = [IndexPath]()
     internal(set) var selectedDates         = [Date]()
-
+    
+    
     internal var eventsByIndexPath = [IndexPath:[CalendarEvent]]()
-
+    
     var events: [CalendarEvent] = [] {
+        
         didSet {
+            
             self.eventsByIndexPath.removeAll()
             
             for event in events {
+                
                 guard let indexPath = self.indexPathForDate(event.startDate) else { continue }
                 
                 var eventsForIndexPath = eventsByIndexPath[indexPath] ?? []
                 eventsForIndexPath.append(event)
                 eventsByIndexPath[indexPath] = eventsForIndexPath
+                
             }
             
             DispatchQueue.main.async { self.collectionView.reloadData() }
         }
     }
-
+    
+    
+    
+    
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
@@ -159,6 +173,7 @@ public class CalendarView: UIView {
         super.awakeFromNib()
         self.setup()
     }
+    
     
     // MARK: Create Subviews
     var headerView: CalendarHeaderView!
@@ -178,7 +193,6 @@ public class CalendarView: UIView {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.itemSize = self.cellSize(in: self.bounds)
-        
         /* Collection View */
         self.collectionView                     = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         self.collectionView.dataSource          = self
@@ -190,6 +204,7 @@ public class CalendarView: UIView {
         self.collectionView.allowsMultipleSelection         = false
         self.collectionView.register(CalendarDayCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         self.addSubview(self.collectionView)
+        
     }
     
     var flowLayout: CalendarFlowLayout {
@@ -197,41 +212,45 @@ public class CalendarView: UIView {
     }
     
     override public func layoutSubviews() {
+        
         super.layoutSubviews()
         
         self.headerView.frame = CGRect(
             x:0.0,
             y:0.0,
             width: self.frame.size.width,
-            height: CalendarView.Style.headerHeight
+            height: CalendarView.Style.HeaderHeight
         )
         
         self.collectionView.frame = CGRect(
             x: 0.0,
-            y: CalendarView.Style.headerHeight,
+            y: CalendarView.Style.HeaderHeight + 10,
             width: self.frame.size.width,
-            height: self.frame.size.height - CalendarView.Style.headerHeight
+            height: self.frame.size.height - CalendarView.Style.HeaderHeight
         )
         
         flowLayout.itemSize = self.cellSize(in: self.bounds)
         
         self.resetDisplayDate()
+        
     }
     
     private func cellSize(in bounds: CGRect) -> CGSize {
         return CGSize(
             width:   frame.size.width / 7.0,                                    // number of days in week
-            height: (frame.size.height - CalendarView.Style.headerHeight) / 6.0 // maximum number of rows
+            height: (frame.size.height - CalendarView.Style.HeaderHeight) / 6.0 // maximum number of rows
         )
     }
-
+    
+    
     internal var monthInfoForSection = [Int:(firstDay:Int, daysTotal:Int)]()
-
+    
     func reloadData() {
         self.collectionView.reloadData()
     }
-
-    func setDisplayDate(_ date : Date, animated: Bool = false) {
+    
+    
+    public func setDisplayDate(_ date : Date, animated: Bool = false) {
         
         guard (date > startDateCache) && (date < endDateCache) else { return }
         
@@ -241,9 +260,11 @@ public class CalendarView: UIView {
         )
         
         self.displayDateOnHeader(date)
+        
     }
     
     internal func resetDisplayDate() {
+        
         guard let displayDate = self.displayDate else { return }
         
         self.collectionView.setContentOffset(
@@ -253,6 +274,7 @@ public class CalendarView: UIView {
     }
     
     func scrollViewOffset(for date: Date) -> CGPoint {
+        
         var point = CGPoint.zero
         
         guard let sections = self.indexPathForDate(date)?.section else { return point }
@@ -264,13 +286,14 @@ public class CalendarView: UIView {
         
         return point
     }
+    
 }
 
 // MARK: Selection of Dates
-
-extension CalendarView {
+public extension CalendarView {
     
     func selectDate(_ date : Date) {
+        
         guard let indexPath = self.indexPathForDate(date) else { return }
         
         self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionViewScrollPosition())
@@ -281,6 +304,7 @@ extension CalendarView {
     }
     
     func deselectDate(_ date : Date) {
+        
         guard let indexPath = self.indexPathForDate(date) else { return }
         
         self.collectionView.deselectItem(at: indexPath, animated: false)
@@ -292,9 +316,8 @@ extension CalendarView {
 }
 
 // MARK: Convertion
-
 extension CalendarView {
-
+    
     func indexPathForDate(_ date : Date) -> IndexPath? {
         
         let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.startOfMonthCache, to: date)
@@ -322,11 +345,13 @@ extension CalendarView {
         components.day      = indexPath.item - monthInfo.firstDay
         
         return self.calendar.date(byAdding: components, to: self.startOfMonthCache)
+        
     }
+    
 }
 
-extension CalendarView {
-
+public extension CalendarView {
+    
     func goToMonthWithOffet(_ offset: Int) {
         
         guard let displayDate = self.displayDate else { return }
@@ -346,4 +371,8 @@ extension CalendarView {
     func goToPreviousMonth() {
         goToMonthWithOffet(-1)
     }
+    
 }
+
+
+
