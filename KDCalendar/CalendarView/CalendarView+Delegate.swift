@@ -40,6 +40,8 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         }
         else {
             
+            selectedDates.removeAll()
+            selectedIndexPaths.removeAll()
             selectedIndexPaths.append(indexPath)
             selectedDates.append(date)
             
